@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreedomHawk User Manual</title>
+<style>
+:root { color-scheme: light dark; --bg:#1e1e1e; --fg:#ffffff; --muted:#c8c8c8;
+  --accent:#7ec8ff; --card:#2a2a2d; --border:#4a4a4a; --code:#ffd479; }
+@media (prefers-color-scheme: light) { :root { --bg:#ffffff; --fg:#141414;
+  --muted:#3a3a3a; --accent:#0b5fb0; --card:#f0f0f2; --border:#c9c9c9; --code:#8a4b00; } }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin:0; background:var(--bg); color:var(--fg); font-size:19px; line-height:1.65;
+  font-family: "Segoe UI", system-ui, sans-serif; }
+.skip { position:absolute; left:-999px; top:0; background:var(--accent); color:#000;
+  padding:.5rem 1rem; z-index:10; }
+.skip:focus { left:0; }
+.layout { display:flex; align-items:flex-start; gap:2rem; max-width:1200px; margin:0 auto;
+  padding:1.5rem; }
+.toc { position:sticky; top:1rem; flex:0 0 300px; background:var(--card);
+  border:1px solid var(--border); border-radius:10px; padding:1rem 1.25rem;
+  max-height:calc(100vh - 2rem); overflow:auto; }
+.toc h2 { margin:.2rem 0 .6rem; font-size:1.15rem; }
+.toc ul { list-style:none; margin:0; padding:0; }
+.toc li { margin:.15rem 0; }
+.toc-sub { padding-left:1.1rem; font-size:.95em; }
+.toc a { color:var(--accent); text-decoration:none; display:block; padding:.25rem .4rem;
+  border-radius:6px; }
+.toc a:hover, .toc a:focus { background:rgba(126,200,255,.18); text-decoration:underline; }
+main { flex:1 1 auto; min-width:0; }
+h1 { font-size:2.1rem; line-height:1.2; margin:.2rem 0 1rem; }
+h2 { font-size:1.6rem; margin:2rem 0 .6rem; padding-bottom:.3rem;
+  border-bottom:2px solid var(--border); scroll-margin-top:1rem; }
+h3 { font-size:1.25rem; margin:1.4rem 0 .5rem; color:var(--fg); scroll-margin-top:1rem; }
+p { margin:.7rem 0; }
+a { color:var(--accent); }
+ul, ol { margin:.6rem 0; padding-left:1.6rem; }
+li { margin:.4rem 0; }
+code { background:var(--card); color:var(--code); padding:.1em .35em; border-radius:5px;
+  font-family: "Cascadia Code", Consolas, monospace; font-size:.92em; }
+pre { background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:1rem; overflow:auto; }
+pre code { background:none; color:var(--fg); padding:0; }
+.table-wrap { overflow-x:auto; margin:1rem 0; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid var(--border); padding:.55rem .7rem; text-align:left;
+  vertical-align:top; }
+th { background:var(--card); }
+strong { color:var(--fg); }
+@media (max-width: 820px) { .layout { flex-direction:column; }
+  .toc { position:static; flex-basis:auto; width:100%; max-height:none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="layout">
+<nav class="toc" aria-label="Table of contents"><h2>Contents</h2><ul><li class="toc-top"><a href="#getting-started">Getting started</a></li><li class="toc-sub"><a href="#what-you-need">What you need</a></li><li class="toc-sub"><a href="#installing">Installing</a></li><li class="toc-sub"><a href="#first-run-your-tone-data">First run: your tone data</a></li><li class="toc-sub"><a href="#launching">Launching</a></li><li class="toc-top"><a href="#the-main-window">The main window</a></li><li class="toc-sub"><a href="#moving-around">Moving around</a></li><li class="toc-sub"><a href="#making-it-yours">Making it yours</a></li><li class="toc-top"><a href="#presets-and-tone-editing">Presets and tone editing</a></li><li class="toc-sub"><a href="#the-presets-tab">The Presets tab</a></li><li class="toc-sub"><a href="#editing-a-tone">Editing a tone</a></li><li class="toc-sub"><a href="#saving-and-files">Saving and files</a></li><li class="toc-top"><a href="#the-tuner">The Tuner</a></li><li class="toc-top"><a href="#playing-along-with-music">Playing along with music</a></li><li class="toc-top"><a href="#the-pedal-connection">The pedal connection</a></li><li class="toc-top"><a href="#keyboard-reference">Keyboard reference</a></li><li class="toc-top"><a href="#troubleshooting">Troubleshooting</a></li><li class="toc-top"><a href="#getting-help-and-contributing">Getting help and contributing</a></li></ul></nav>
+<main id="content">
+<h1>FreedomHawk User Manual</h1>
+<p>Welcome to FreedomHawk — an accessible, screen-reader-first editor for the Line 6 Firehawk FX, with a built-in suite of practice tools. This manual is written for keyboard and screen-reader use throughout: every feature described here works without a mouse and announces itself. It is structured with heading levels, so you can navigate it the same way you navigate the app — by jumping between headings.</p>
+<p>A note on what works today: <strong>everything in this manual works right now except live pedal control</strong>, which is in its final validation stage. Tone editing, presets, the and the tuner are fully functional offline. See "The pedal connection" near the end for the current state of live control.</p>
+<h2 id="getting-started">Getting started</h2>
+<h3 id="what-you-need">What you need</h3>
+<ul><li>Windows, with Python 3.10 or newer installed.</li><li>If you use a screen reader, FreedomHawk is built and tested with <strong>NVDA</strong>. Spoken feedback also works through Windows speech when NVDA isn't running.</li><li>Optionally: your Firehawk FX paired over Bluetooth (for the play-along feature now, and live control later).</li></ul>
+<h3 id="installing">Installing</h3>
+<p>From the project folder, in a terminal:</p>
+<pre><code>python -m venv .venv
+.venv\Scripts\python -m pip install -e ".[ui,dev]"</code></pre>
+<h3 id="first-run-your-tone-data">First run: your tone data</h3>
+<p>FreedomHawk ships none of Line 6's data. You generate it once, locally, from a copy of the discontinued Firehawk Remote app (an APK file) that you lawfully have:</p>
+<pre><code>.venv\Scripts\python tools\extract_assets.py path\to\firehawk-remote.apk</code></pre>
+<p>This fills in the 261 amp, cab, and effect models the editor works with. It only ever lives on your machine.</p>
+<h3 id="launching">Launching</h3>
+<p>Double-click <strong><code>Firehawk.bat</code></strong>, or run <code>.venv\Scripts\python -m firehawk</code>.</p>
+<p><strong>After updating the app's code, restart it</strong> — a running copy keeps using the code it launched with.</p>
+<h2 id="the-main-window">The main window</h2>
+<p>The window is a list of tabs down the left side, with each tab's controls to the right. The tabs are: <strong>Presets</strong>, one tab per signal-chain block (Wah, Compressor, Noise Gate, Amp, Cabinet, EQ, FX 1–3, Reverb, Volume Pedal, Variax, Global), and the <strong>Tuner</strong>.</p>
+<h3 id="moving-around">Moving around</h3>
+<ul><li><strong>Up/Down arrows</strong> on the tab list move between tabs; <strong>Tab</strong> moves into a tab's controls; <strong>Escape</strong> steps back out (controls → tab list → Presets).</li><li><strong>Ctrl+1 through Ctrl+9</strong> jump straight to the first nine tabs; <strong>Ctrl+B</strong> returns to Presets from anywhere.</li><li><strong>F1</strong> opens the complete keyboard-command list at any time.</li><li><strong>Alt</strong> opens the menus: File, Go, Settings, Device, Help.</li></ul>
+<h3 id="making-it-yours">Making it yours</h3>
+<ul><li><strong>Settings → Arrange Tabs…</strong> reorders the tabs: select one, press <strong>Alt+Up</strong> or <strong>Alt+Down</strong> to move it, OK to apply. The order persists between sessions. The first tab is where the app starts, and Ctrl+1–9 follow your order.</li><li><strong>Settings → Dark Mode</strong> toggles the high-contrast dark theme with large white labels (on by default).</li></ul>
+<h2 id="presets-and-tone-editing">Presets and tone editing</h2>
+<h3 id="the-presets-tab">The Presets tab</h3>
+<p>A list of every preset — factory and your own — with a details pane that reads the selected preset's full signal chain. From here you can <strong>Open</strong> a preset into the editor, <strong>Save Current As…</strong>, <strong>Delete</strong>, and <strong>Refresh</strong>.</p>
+<h3 id="editing-a-tone">Editing a tone</h3>
+<p>Each block tab (Amp, Reverb, FX 1, …) has:</p>
+<ul><li>an <strong>enabled checkbox</strong> to switch the block on or off,</li><li>a <strong>model dropdown</strong> to choose which amp/effect the block runs,</li><li>one labelled control per parameter: <strong>sliders</strong> for continuous values (they announce real values — decibels, BPM, percent — not raw positions), <strong>dropdowns</strong> for stepped choices, <strong>checkboxes</strong> for switches.</li></ul>
+<p>Changing the model rebuilds the parameter list for the new model. All names and ranges come from the pedal's own data — nothing is approximated.</p>
+<h3 id="saving-and-files">Saving and files</h3>
+<ul><li><strong>Ctrl+N</strong> — new preset. <strong>Ctrl+S</strong> — save to your library (you'll be asked for a name). <strong>Ctrl+O</strong> — open a preset file. <strong>File → Export Preset to File…</strong> writes the current tone as a JSON file you can back up or share.</li><li>If you have unsaved changes, the app offers Save / Discard / Cancel before anything would overwrite them.</li><li><strong>Settings → User Presets Folder…</strong> tells you where your library lives on disk.</li></ul>
+<h2 id="the-tuner">The Tuner</h2>
+<p>Tune by ear against a sustained reference tone — no lights, no meters.</p>
+<ol><li>Pick your <strong>instrument</strong>: 6, 7, or 8-string guitar, or 4, 5, or 6-string bass.</li><li>Pick a <strong>tuning</strong> — from standard through drop tunings, open tunings, DADGAD, all-fourths, and more.</li><li>Press a <strong>string button</strong> to hold that string's tone; tune to it; press again (or <strong>Stop Tone</strong>) to stop. The tone also stops when you leave the tab.</li></ol>
+<h2 id="playing-along-with-music">Playing along with music</h2>
+<p>The Firehawk FX is also a Bluetooth speaker. Pair it with Windows, set it as the playback device in Windows Sound settings, and any music you play comes through the pedal while you play guitar over it. No app setting needed — see <strong>Help → Playing Along with Music</strong> for the steps.</p>
+<h2 id="the-pedal-connection">The pedal connection</h2>
+<p>Live control — sending your edits to the pedal — is the one feature still in validation. The protocol has been fully reverse-engineered and implemented; two final byte-level details await confirmation against a capture of the original app's traffic. Until then:</p>
+<ul><li><strong>Device → Connect to Pedal…</strong> finds the pedal's Bluetooth COM port.</li><li><strong>Device → View Outgoing Messages…</strong> shows the exact bytes each edit would send.</li><li><strong>Transmit is off by default</strong> and warns before enabling — nothing is written to your hardware until the protocol is confirmed safe.</li></ul>
+<p>Everything else in this manual is fully usable offline, today.</p>
+<h2 id="keyboard-reference">Keyboard reference</h2>
+<div class="table-wrap"><table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody><tr><td>Ctrl+N / Ctrl+O / Ctrl+S</td><td>New / open / save preset</td></tr><tr><td>Ctrl+1 … Ctrl+9</td><td>Jump to the first nine tabs (your order)</td></tr><tr><td>Ctrl+B</td><td>Back to Presets</td></tr><tr><td>Escape</td><td>Step back: controls → tab list → Presets; closes dialogs</td></tr><tr><td>Tab / Shift+Tab</td><td>Move between controls</td></tr><tr><td>Alt</td><td>Open the menus</td></tr><tr><td>F1</td><td>Keyboard-command list (in the Pattern Editor: speaks the grid keys)</td></tr><tr><td>Alt+Up / Alt+Down</td><td>Move a tab (in Settings → Arrange Tabs)</td></tr></tbody></table></div>
+<p>In the Pattern Editor grid: Up/Down lines · Left/Right step · Ctrl+Left/Right beat · Ctrl+Shift+Left/Right bar · Home/End · Space cycle on/accent/ghost/off · minus/plus line length (polymeter) · brackets <code>[</code>/<code>]</code> tune the line (Shift = octave) · comma/period <code>,</code>/<code>.</code> line volume · C choke group · Enter sample options · Delete remove line · P preview (speaks the note).</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul><li><strong>A button seems to do nothing</strong> — it should never happen (everything speaks); if it does, report it. Make sure you restarted the app after an update.</li><li><strong>No tuner sound</strong> — check Windows' output device and volume mixer; the app plays through the default output device.</li><li><strong>Spoken grid navigation is silent</strong> — the <code>accessible_output2</code> package provides direct speech; reinstall dependencies with <code>.venv\Scripts\python -m pip install -e ".[ui]"</code>.</li><li><strong>The Groove dropdown doesn't show my edited pattern's name</strong> — after editing, your working pattern is what plays even though the dropdown still names the last selected groove. Save it as a preset to give it a name in the list.</li></ul>
+<h2 id="getting-help-and-contributing">Getting help and contributing</h2>
+<p>FreedomHawk is free software: <a href="https://github.com/CoveCathedral/FreedomHawk">github.com/CoveCathedral/FreedomHawk</a>. Issues and pull requests are welcome — screen-reader testing feedback most of all.</p>
+<p><strong>Licensing.</strong> Copyright © 2026 Kaylea Fox, under the GNU Affero General Public License v3 or later. <strong>You may use FreedomHawk for anything, including paid work.</strong> If you distribute a modified version, you must share your source under the same license and keep the credit. For closed-source or commercial use, a separate commercial license can be arranged — get in touch. FreedomHawk ships none of Line 6's data; you generate that locally from an app copy you lawfully own.</p>
+</main>
+</div>
+</body>
+</html>

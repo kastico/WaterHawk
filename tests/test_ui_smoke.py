@@ -1,0 +1,228 @@
+"""Headless smoke test: the UI constructs and reacts without errors.
+
+Skips automatically if a wx display cannot be created (e.g. a headless CI without
+the platform GUI available).
+"""
+
+import pytest
+
+wx = pytest.importorskip("wx")
+
+try:
+    _APP = wx.App(False)
+except Exception:  # pragma: no cover - no GUI available
+    pytest.skip("no wx display available", allow_module_level=True)
+
+import firehawk.config as config
+from firehawk.model import SLOT_LAYOUT
+from firehawk.ui.blockpanel import BlockPanel
+from firehawk.ui.mainframe import MainFrame
+from firehawk.ui.presetspanel import PresetsPanel
+from firehawk.ui.tunerpanel import TunerPanel
+
+
+@pytest.fixture(autouse=True)
+def _silence_audio(monkeypatch):
+    """No spoken output during tests, and stop any looping sound afterwards."""
+    from firehawk.ui import speech
+    spoken: list[str] = []
+    monkeypatch.setattr(speech, "speak",
+                        lambda text, interrupt=True: spoken.append(text))
+    yield spoken
+    try:
+        import winsound
+        winsound.PlaySound(None, 0)
+    except Exception:  # pragma: no cover - non-Windows / no audio
+        pass
+
+
+@pytest.fixture()
+def frame(tmp_path, monkeypatch):
+    # Isolate the tab-order settings file so tests never touch the real one.
+    monkeypatch.setattr(config, "CONFIG_FILE", tmp_path / "settings.json")
+    f = MainFrame()
+    yield f
+    # Deterministic teardown: stop audio/timers on the Tuner, then flush the
+    # deferred Destroy so native resources are freed between tests (there is no running
+    # event loop to process pending deletes otherwise).
+    if f.tuner_page is not None:
+        f.tuner_page.dispose()
+    f.Destroy()
+    wx.SafeYield()
+
+
+def _block_pages(frame):
+    for i in range(frame.listbook.GetPageCount()):
+        page = frame.listbook.GetPage(i)
+        if isinstance(page, BlockPanel):
+            yield page
+
+
+def _block_page(frame, slot_id):
+    for page in _block_pages(frame):
+        if page.slot.id == slot_id:
+            return page
+    raise AssertionError(f"no page for slot {slot_id}")
+
+
+def test_has_presets_page_and_all_blocks(frame):
+    # Presets + Tuner pages, plus one per slot.
+    assert frame.listbook.GetPageCount() == len(SLOT_LAYOUT) + 2
+    assert isinstance(frame.listbook.GetPage(0), PresetsPanel)
+
+
+def test_default_order_puts_tuner_last(frame):
+    assert frame._view_ids[0] == "presets"
+    assert frame._view_ids[-1:] == ["tuner"]
+    assert isinstance(frame.listbook.GetPage(frame.listbook.GetPageCount() - 1), TunerPanel)
+
+
+def test_reorder_rebuilds_and_persists(frame):
+    new_order = ["tuner"] + [v for v in frame._view_ids if v != "tuner"]
+    frame.settings.set_page_order(new_order)
+    frame._rebuild_after_reorder()
+    assert frame._view_ids == new_order
+    # The Tuner is now the first page, and the live tuner reference points to it.
+    assert isinstance(frame.listbook.GetPage(0), TunerPanel)
+    assert frame.tuner_page is frame.listbook.GetPage(0)
+    # The order was written to the (isolated) settings file.
+    assert config.AppSettings().page_order() == new_order
+
+
+def test_editing_still_works_after_reorder(frame):
+    frame.settings.set_page_order(list(reversed(frame._view_ids)))
+    frame._rebuild_after_reorder()
+    amp = _block_page(frame, "amp")
+    amp._on_param("Bass", 0.42)
+    assert frame.buffer.get_param("amp", "Bass") == pytest.approx(0.42)
+
+
+def test_app_window_title_is_freedomhawk(frame):
+    assert frame.GetTitle() == "FreedomHawk"
+
+
+def test_every_control_has_accessible_name(frame):
+    """The core accessibility guarantee: no control announces as blank."""
+    for page in _block_pages(frame):
+        for pc in page._params:
+            if isinstance(pc.control, wx.CheckBox):
+                # A checkbox's accessible name is its own label text.
+                assert pc.control.GetLabel().strip(), f"blank checkbox in {page.slot.id}"
+            else:
+                assert pc.control.GetName().strip(), f"blank name in {page.slot.id}"
+
+
+def test_no_spin_controls_used(frame):
+    """Spin controls read only their value to NVDA, so none should be present."""
+    for page in _block_pages(frame):
+        for pc in page._params:
+            assert not isinstance(pc.control, (wx.SpinCtrl, wx.SpinCtrlDouble)), \
+                f"spin control in {page.slot.id} ({pc.spec.symbolic_id})"
+
+
+def test_integer_param_is_dropdown_and_maps_value(frame):
+    # Cabinet @mic is an integer 0..3 -> a dropdown whose selection maps to the value.
+    cab = _block_page(frame, "cab")
+    mic = next(pc for pc in cab._params if pc.spec.symbolic_id == "@mic")
+    assert isinstance(mic.control, wx.Choice)
+    mic.control.SetSelection(3)
+    cab._on_param("@mic", cab.buffer.model_of("cab").param("@mic").minimum + 3)
+    assert frame.buffer.get_param("cab", "@mic") == 3
+
+
+def test_enable_checkboxes_are_labelled(frame):
+    for page in _block_pages(frame):
+        if page.enable_cb is not None:
+            assert page.enable_cb.GetLabel().strip()
+
+
+def test_model_swap_rebuilds_params(frame):
+    amp = _block_page(frame, "amp")
+    amp.model_choice.SetSelection(2)
+    amp._on_model(wx.CommandEvent(wx.EVT_CHOICE.typeId, amp.model_choice.GetId()))
+    assert frame.buffer.block("amp").model_id == amp._model_ids[2]
+
+
+def test_param_edit_updates_buffer(frame):
+    amp = _block_page(frame, "amp")
+    amp._on_param("Bass", 0.33)
+    assert frame.buffer.get_param("amp", "Bass") == pytest.approx(0.33)
+
+
+def test_open_preset_refreshes_pages(frame):
+    presets_page = frame.listbook.GetPage(0)
+    presets_page.reload()
+    assert presets_page.list.GetCount() >= 1  # at least the factory preset
+    # Opening the factory preset loads it and lands on the Amp page.
+    presets_page.list.SetSelection(0)
+    presets_page._open_selected()
+    assert frame.buffer.block("amp").model_id is not None
+
+
+def test_goto_changes_selection(frame):
+    frame._goto(3)
+    assert frame.listbook.GetSelection() == 3
+
+
+def test_back_to_presets(frame):
+    frame._goto_view("amp")
+    assert frame.listbook.GetSelection() != 0
+    frame._goto_view("presets")
+    assert frame.listbook.GetSelection() == 0
+
+
+def test_new_preset(frame):
+    frame._on_new(None)
+    assert frame.buffer.preset.meta["name"] == "New Preset"
+    # Lands on the Amp page ready to edit.
+    assert frame._view_ids[frame.listbook.GetSelection()] == "amp"
+
+
+def test_dark_mode_toggle(frame):
+    assert frame.dark_mode is True
+    frame.dark_item.Check(False)
+    frame._on_toggle_dark(None)
+    assert frame.dark_mode is False
+    frame.dark_item.Check(True)
+    frame._on_toggle_dark(None)
+    assert frame.dark_mode is True
+
+
+def test_dirty_tracking_and_clean_after_load(frame):
+    assert frame._dirty is False
+    # Editing marks dirty via the buffer listener.
+    frame.buffer.set_param("amp", "Bass", 0.2)
+    assert frame._dirty is True
+    # Loading a preset clears the dirty flag.
+    frame._on_open_preset(frame.library.factory_presets()[0].preset.copy())
+    assert frame._dirty is False
+
+
+def test_continuous_control_is_slider(frame):
+    # Noise Gate Threshold is a real-world dB range -> a slider (not a spin field).
+    gate = _block_page(frame, "gate")
+    thr = next(pc for pc in gate._params if pc.spec.symbolic_id == "Thresh")
+    assert isinstance(thr.control, wx.Slider)
+    assert thr.control.GetName().strip()
+
+
+def test_forced_name_defers_to_child_items():
+    """A forced accessible name must apply to the control only, not its children,
+    so list items and dropdown options keep their own names (NVDA regression)."""
+    from firehawk.ui import accessibility
+    if not hasattr(wx, "Accessible"):
+        pytest.skip("wx.Accessible not available on this build")
+    acc = accessibility._NamedAccessible("Presets")
+    assert acc.GetName(0) == (wx.ACC_OK, "Presets")            # the control itself
+    assert acc.GetName(1)[0] == wx.ACC_NOT_IMPLEMENTED         # a child item -> native name
+
+
+def test_sliders_have_forced_accessible_name(frame):
+    """Sliders/spins/choices carry a forced accessible object (not just SetName)."""
+    if not hasattr(wx, "Accessible"):
+        pytest.skip("wx.Accessible not available on this build")
+    amp = _block_page(frame, "amp")
+    non_checkbox = [pc for pc in amp._params if not isinstance(pc.control, wx.CheckBox)]
+    assert non_checkbox, "amp should have sliders"
+    for pc in non_checkbox:
+        assert hasattr(pc.control, "_firehawk_acc")

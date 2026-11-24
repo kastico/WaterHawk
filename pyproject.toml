@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "firehawk-accessible"
+version = "0.1.0"
+description = "Accessible, screen-reader-first Windows controller for the Line 6 Firehawk FX pedal"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Kaylea Fox", email = "kaylielynnfox@gmail.com" }]
+license = { text = "AGPL-3.0-or-later" }
+dependencies = [
+    "pyserial>=3.5",
+]
+
+[project.optional-dependencies]
+# accessible_output2 provides direct screen-reader speech (ui/speech.py). The core
+# (protocol/model) needs none of these.
+ui = ["wxPython>=4.2", "accessible_output2>=0.17"]
+dev = ["pytest>=8.0", "pytest-timeout>=2.1", "accessible_output2>=0.17"]
+
+[project.scripts]
+firehawk = "firehawk.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+firehawk = ["data/*.json", "data/*.models", "data/*.bin", "presets/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+# Safety net: the headless GUI tests drive real audio/timers with no event loop, which
+# can very occasionally wedge. A per-test timeout turns any hang into a fast failure with
+# a stack trace instead of blocking the whole run. 'thread' method works on Windows.
+timeout = 60
+timeout_method = "thread"

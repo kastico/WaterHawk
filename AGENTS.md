@@ -1,0 +1,186 @@
+# AGENTS.md — Firehawk FX Accessible Controller
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues in `kastico/FreedomHawk` (private); external PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context (`CONTEXT.md` + `docs/adr/` at root). See `docs/agents/domain.md`.
+
+## Project purpose
+
+Build an **accessible, screen-reader-first Windows application** that controls a
+Line 6 **Firehawk FX** guitar multi-effects pedal directly over its Bluetooth serial
+link — replacing the discontinued, never-accessible Line 6 "Firehawk Remote" mobile app
+and its dead-or-dying cloud.
+
+The end user is **blind and uses the NVDA screen reader** as their primary way to access
+the computer. Accessibility is not a feature of this project — it is the entire point.
+The pedal has six knobs and a small screen the user cannot read; without a working,
+accessible editor, hundreds of parameters (amps, cabs, effects, reverbs, wah) are simply
+unreachable to them, and the hardware they own is on a path to becoming a brick.
+
+## The accessibility mandate (highest priority — never trade away)
+
+1. **Every UI control must be a standard native widget** that exposes a correct
+   accessible name, value, role, and range to NVDA. Built with **wxPython** (native Win32
+   controls — the toolkit NVDA's own GUI uses). **Never** use canvas-drawn, custom-painted,
+   or web-embedded controls for anything the user must operate.
+2. **Only three control types read reliably with NVDA here — use nothing else:** a
+   **checkbox** (name in its label), a **slider** (name forced via `wx.Accessible`), and a
+   **dropdown `wx.Choice`** (name forced). **Never use spin controls** (`wx.SpinCtrl`/
+   `wx.SpinCtrlDouble`) — they announce only their value, not their label. So: continuous
+   params → slider; integer/enum params → dropdown (or slider for wide ranges); models →
+   dropdown; block toggles → checkbox. All ranges come from the model metadata.
+3. **Keyboard-first.** Everything must be reachable and operable by keyboard alone, with a
+   sensible tab order. No mouse-only interactions.
+4. When responding to the user in chat, **structure every reply with Markdown heading
+   levels** (`#`, `##`, `###`) so NVDA can navigate by heading. This is a standing
+   preference for this project.
+5. Verify accessibility with NVDA in the loop, not just visually. A control that looks fine
+   but announces nothing to NVDA is broken.
+
+### Hard-won rules from live NVDA testing (follow these; each fixed a real failure)
+
+- **The status bar is inaudible.** NVDA never announces `SetStatusText`. Anything a button
+  press must tell the user goes in a spoken `wx.MessageBox` or moves focus into a dialog.
+  Status text is passive supplementary info only.
+- **Sliders announce percent-of-range by default.** Pass a `value_fn` to
+  `set_accessible_name` so NVDA speaks the real value ("60 BPM", "-54.5 dB") — required
+  for every slider whose unit isn't literally percent.
+- **Dialogs steal Enter (default button) and Space** before a child control's
+  `EVT_KEY_DOWN` runs. Custom key handling inside a dialog must bind `EVT_CHAR_HOOK` on
+  the dialog, route only its keys and only while the target control has focus, and
+  `Skip()` everything else.
+- **Dialogs must land focus on their primary control** on open (`wx.CallAfter(SetFocus)`)
+  and wrap construction in try/except that shows an error dialog — a swallowed exception
+  is a silent dead button.
+- **For dense editing surfaces** (anything grid-like, now or in the future) use the
+  **tracker model** the user designed: a ListBox with one row per item, a shared cursor on fully-owned arrow keys (plain = smallest step, Ctrl = next unit,
+  Ctrl+Shift = largest), every move **spoken directly** via `ui/speech.py`
+  (accessible_output2: NVDA, then SAPI, no-op degrade). Do not build dropdown+checkbox
+  forms for grids — "tabbing through all those is a nightmare."
+- **winsound `SND_MEMORY` is unreliable on real hardware.** Always play audio via a temp
+  WAV file + `SND_FILENAME|SND_ASYNC` (see `_PreviewPlayer`), and pair audio actions with
+  spoken feedback so a playback failure is still audible as words.
+- **Teardown code must touch no UI** (no `SetStatusText` during window destruction), and
+  audio/timers need explicit `dispose()` paths.
+
+## What this project is (legitimacy)
+
+This is **interoperability and assistive-technology reverse engineering of hardware the
+user lawfully owns**, on a product Line 6 formally discontinued in 2024. There is no
+exploit, no malware, no copy-protection circumvention, and no third-party target system.
+The decompiled Java and native symbol lists are working notes toward a clean, independent
+reimplementation — an accessible editor. This is squarely covered by the DMCA §1201
+exemptions for assistive technology and interoperability and the interop line of precedent.
+Do not redistribute Line 6 code.
+
+## Architecture (mirror the three layers found in the app)
+
+1. **`transport`** — open the paired pedal's Windows COM/RFCOMM port and read/write raw
+   bytes. Thin, like the Java byte pump. `pyserial` opens the COM port directly; no BLE
+   stack needed. RFCOMM/SPP UUID `00001101-0000-1000-8000-00805f9b34fb`.
+2. **`protocol`** — frame/deframe the wire format (RobustSerialMsgChannel envelope +
+   transport header + **CRC-16**), and encode/decode `SetEditBufferParam` and friends.
+   **This layer consumes the one remaining unknown (see below).**
+3. **`model`** — load the shipped data model (`assets/*.models`, `firehawk_symbols.json`)
+   at startup: every model, parameter, range, and value type. This is the source of truth
+   for what is editable and how values map. Keep it as flat data files.
+
+Additional layers that grew from the build:
+4. **`device`** — the gated bridge: subscribes to edit-buffer changes, encodes each edit
+   via the protocol layer, logs to an outbox; transmits ONLY when explicitly enabled
+   (off by default, confirmation-gated) — nothing touches hardware until validated.
+5. **`practice`** — the musician tools engine (tuner math).
+   **Deliberately UI-free and firehawk-independent**: keep these modules extraction-clean
+   (flat JSON data, no pedal imports).
+
+State model: a `FirehawkEditBuffer` object mirroring `default_preset.json`. UI reads/writes
+it; the `protocol` layer turns writes into frames. Ship incrementally: get "recall preset +
+toggle a block + move one parameter" working first, then widen coverage.
+
+## Solved vs. remaining
+
+**Solved — the tone model:** all 261 models with parameters, ranges, value types; the
+symbol table fully decoded (`firehawk_symbols.json`).
+
+**Solved — the wire protocol (2026-07, via Ghidra; full writeup in `docs/protocol.md`):**
+CRC-16/CCITT-FALSE; serial frame (sync `55 55` + 12-byte header + payload); 8-byte
+transport header; both write paths — bulk preset save (key→TypedValue stream) and live
+single-parameter set (ToneMatch commands: SetDspModelParam / SetPresetPSKeyParam / tempo /
+LoadDspModel); model-knob addressing via symbol-table indices. All implemented and unit-
+tested in `firehawk.protocol`.
+
+**Remaining:** just **two inferred constants** (the float type tag and the ToneMatch
+transport port), both flagged in code. One Bluetooth HCI capture of the old app changing a
+parameter confirms both (beginner walkthrough in `docs/capture-guide.md`) — then transmit
+can be validated and enabled.
+
+## Where the files are
+
+- **Full APK:** `com-line6-firehawk-12-52500150-*.apk` (project root). SHA-256:
+  `eeaaa742ae412085632a569e56a2010c3c2abde415551bdb00ffa122981dccb5`.
+  All `assets/` (`*.models`, `*Catalog.json`, `default_preset.json`, `defaultSymbolTable.bin`)
+  can be extracted from here with `unzip`.
+- **Bundle folder** `Firehalk Decompiled from Webchat/`: currently `symtable.py` (validated
+  symbol-table decoder) and `firehawk_symbols.json` (610 decoded symbols). The `assets/`,
+  `decompiled/` Java, and `native_protocol_symbols.txt` referenced in the handoff are **not**
+  yet extracted into this folder — pull them from the APK as needed.
+- **Handoff doc:** `C:\Users\Kaylie\Downloads\HANDOFF.md` — full reverse-engineering writeup.
+
+## Semantic API to reimplement (maps 1:1 to preset JSON)
+
+- `SetEditBufferParam(groupID, paramID, value)` / `GetEditBufferParam(groupID, paramID)`
+- group/param enumeration, tuner, device settings, model enumeration.
+- `groupID`/`paramID` are exactly the keys in `default_preset.json`: groups like `amp`,
+  `cab`, `compressor`, `eq`, `fx1`–`fx3`, `gate`, `reverb`, `volume`, `wah`, `global`;
+  params like `Bass`, `Drive`, `Treble`, `@model`, `@enabled`, `@mix`.
+
+## Build conventions
+
+- **Language: Python.** UI: **wxPython**, native controls only (checkbox/slider/dropdown).
+- Model metadata drives every control's label and range — never hardcode UI ranges.
+- Flat data files as source of truth (matches the user's flat-file habit).
+- Test the `model` layer with assertions that known models/params/ranges resolve correctly.
+
+## Process (agile + GitHub tracker)
+
+This project follows Kaylea's agile + GitHub-tracker process — full method in
+process playbook (see DR-001); adoption recorded in
+[docs/DECISIONS.md](docs/DECISIONS.md) (DR-001).
+
+- **The tracker is the queue.** GitHub issues + milestones hold all work-in-flight
+  (`gh issue list`; what waits on the owner: `gh issue list --label needs-human-test`).
+  Milestones map to the ROADMAP phases. Reviewer findings that outlive a PR, standing
+  obligations, and Kaylea's design inputs all become issues. Commits close them with
+  `Fixes #N`. Records: [docs/STATUS.md](docs/STATUS.md) (slim pointer),
+  [docs/DECISIONS.md](docs/DECISIONS.md) (a record per deviation).
+- **Gate before every PR:** `.venv\Scripts\python scripts\gate.py` (compile + tests; ruff
+  if present). Grow it when a defect class recurs.
+- **Branch-plus-PR** once feature work resumes. GitHub refuses formal review states on
+  same-account PRs, so verdicts are labels: **`review:code-approved` + `review:a11y-approved`
+  are the merge gate**; `review:changes-requested` is informational. Reviewers verify by
+  running, not reading; NVDA claims are hypotheses closed only by Kaylea's test.
+- **Human checkpoints:** never claim something "works with NVDA" — enumerate exactly what
+  Kaylea should verify; her recorded results outrank any agent's reasoning.
+
+### Team roles & commit trailers (this project's domain: pedal RE + accessible editor)
+
+One agent per working tree; concurrency uses isolated `git worktree`; never two full test
+gates at once. Commits are authored as **kastico**; each agent ends its commit message with
+its role trailer (pi agents only; no Claude attribution):
+
+- **Builder** — implementation across model/UI/device layers. Trailer: `Co-Authored-By: pi (FreedomHawk Builder)`
+- **Protocol/RE** — the wire format, Ghidra/native work, byte-level encoders. Trailer: `Co-Authored-By: pi (FreedomHawk Protocol)`
+- **Accessibility Reviewer** (veto) — NVDA correctness, native-control rules. Trailer: `Co-Authored-By: pi (FreedomHawk Accessibility Reviewer)`
+- **Code Reviewer** (veto) — correctness, tests, protocol safety (transmit stays gated). Trailer: `Co-Authored-By: pi (FreedomHawk Code Reviewer)`
+
+Role definitions live in `.pi/agents/` as they are added.
