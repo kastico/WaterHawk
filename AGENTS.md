@@ -4,7 +4,7 @@
 
 ### Issue tracker
 
-GitHub Issues in `kastico/FreedomHawk` (private); external PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+GitHub Issues in `kastico/WaterHawk` (private); external PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
@@ -178,9 +178,9 @@ One agent per working tree; concurrency uses isolated `git worktree`; never two 
 gates at once. Commits are authored as **kastico**; each agent ends its commit message with
 its role trailer (pi agents only; no Claude attribution):
 
-- **Builder** — implementation across model/UI/device layers. Trailer: `Co-Authored-By: pi (FreedomHawk Builder)`
-- **Protocol/RE** — the wire format, Ghidra/native work, byte-level encoders. Trailer: `Co-Authored-By: pi (FreedomHawk Protocol)`
-- **Accessibility Reviewer** (veto) — NVDA correctness, native-control rules. Trailer: `Co-Authored-By: pi (FreedomHawk Accessibility Reviewer)`
-- **Code Reviewer** (veto) — correctness, tests, protocol safety (transmit stays gated). Trailer: `Co-Authored-By: pi (FreedomHawk Code Reviewer)`
+- **Builder** — implementation across model/UI/device layers. Trailer: `Co-Authored-By: pi (WaterHawk Builder)`
+- **Protocol/RE** — the wire format, Ghidra/native work, byte-level encoders. Trailer: `Co-Authored-By: pi (WaterHawk Protocol)`
+- **Accessibility Reviewer** (veto) — NVDA correctness, native-control rules. Trailer: `Co-Authored-By: pi (WaterHawk Accessibility Reviewer)`
+- **Code Reviewer** (veto) — correctness, tests, protocol safety (transmit stays gated). Trailer: `Co-Authored-By: pi (WaterHawk Code Reviewer)`
 
 Role definitions live in `.pi/agents/` as they are added.

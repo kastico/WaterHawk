@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FreedomHawk User Manual</title>
+<title>WaterHawk User Manual</title>
 <style>
 :root { color-scheme: light dark; --bg:#1e1e1e; --fg:#ffffff; --muted:#c8c8c8;
   --accent:#7ec8ff; --card:#2a2a2d; --border:#4a4a4a; --code:#ffd479; }
@@ -57,18 +57,18 @@ strong { color:var(--fg); }
 <div class="layout">
 <nav class="toc" aria-label="Table of contents"><h2>Contents</h2><ul><li class="toc-top"><a href="#getting-started">Getting started</a></li><li class="toc-sub"><a href="#what-you-need">What you need</a></li><li class="toc-sub"><a href="#installing">Installing</a></li><li class="toc-sub"><a href="#first-run-your-tone-data">First run: your tone data</a></li><li class="toc-sub"><a href="#launching">Launching</a></li><li class="toc-top"><a href="#the-main-window">The main window</a></li><li class="toc-sub"><a href="#moving-around">Moving around</a></li><li class="toc-sub"><a href="#making-it-yours">Making it yours</a></li><li class="toc-top"><a href="#presets-and-tone-editing">Presets and tone editing</a></li><li class="toc-sub"><a href="#the-presets-tab">The Presets tab</a></li><li class="toc-sub"><a href="#editing-a-tone">Editing a tone</a></li><li class="toc-sub"><a href="#saving-and-files">Saving and files</a></li><li class="toc-top"><a href="#the-tuner">The Tuner</a></li><li class="toc-top"><a href="#playing-along-with-music">Playing along with music</a></li><li class="toc-top"><a href="#the-pedal-connection">The pedal connection</a></li><li class="toc-top"><a href="#keyboard-reference">Keyboard reference</a></li><li class="toc-top"><a href="#troubleshooting">Troubleshooting</a></li><li class="toc-top"><a href="#getting-help-and-contributing">Getting help and contributing</a></li></ul></nav>
 <main id="content">
-<h1>FreedomHawk User Manual</h1>
-<p>Welcome to FreedomHawk — an accessible, screen-reader-first editor for the Line 6 Firehawk FX, with a built-in suite of practice tools. This manual is written for keyboard and screen-reader use throughout: every feature described here works without a mouse and announces itself. It is structured with heading levels, so you can navigate it the same way you navigate the app — by jumping between headings.</p>
+<h1>WaterHawk User Manual</h1>
+<p>Welcome to WaterHawk — an accessible, screen-reader-first editor for the Line 6 Firehawk FX, with a built-in suite of practice tools. This manual is written for keyboard and screen-reader use throughout: every feature described here works without a mouse and announces itself. It is structured with heading levels, so you can navigate it the same way you navigate the app — by jumping between headings.</p>
 <p>A note on what works today: <strong>everything in this manual works right now except live pedal control</strong>, which is in its final validation stage. Tone editing, presets, the and the tuner are fully functional offline. See "The pedal connection" near the end for the current state of live control.</p>
 <h2 id="getting-started">Getting started</h2>
 <h3 id="what-you-need">What you need</h3>
-<ul><li>Windows, with Python 3.10 or newer installed.</li><li>If you use a screen reader, FreedomHawk is built and tested with <strong>NVDA</strong>. Spoken feedback also works through Windows speech when NVDA isn't running.</li><li>Optionally: your Firehawk FX paired over Bluetooth (for the play-along feature now, and live control later).</li></ul>
+<ul><li>Windows, with Python 3.10 or newer installed.</li><li>If you use a screen reader, WaterHawk is built and tested with <strong>NVDA</strong>. Spoken feedback also works through Windows speech when NVDA isn't running.</li><li>Optionally: your Firehawk FX paired over Bluetooth (for the play-along feature now, and live control later).</li></ul>
 <h3 id="installing">Installing</h3>
 <p>From the project folder, in a terminal:</p>
 <pre><code>python -m venv .venv
 .venv\Scripts\python -m pip install -e ".[ui,dev]"</code></pre>
 <h3 id="first-run-your-tone-data">First run: your tone data</h3>
-<p>FreedomHawk ships none of Line 6's data. You generate it once, locally, from a copy of the discontinued Firehawk Remote app (an APK file) that you lawfully have:</p>
+<p>WaterHawk ships none of Line 6's data. You generate it once, locally, from a copy of the discontinued Firehawk Remote app (an APK file) that you lawfully have:</p>
 <pre><code>.venv\Scripts\python tools\extract_assets.py path\to\firehawk-remote.apk</code></pre>
 <p>This fills in the 261 amp, cab, and effect models the editor works with. It only ever lives on your machine.</p>
 <h3 id="launching">Launching</h3>
@@ -104,8 +104,8 @@ strong { color:var(--fg); }
 <h2 id="troubleshooting">Troubleshooting</h2>
 <ul><li><strong>A button seems to do nothing</strong> — it should never happen (everything speaks); if it does, report it. Make sure you restarted the app after an update.</li><li><strong>No tuner sound</strong> — check Windows' output device and volume mixer; the app plays through the default output device.</li><li><strong>Spoken grid navigation is silent</strong> — the <code>accessible_output2</code> package provides direct speech; reinstall dependencies with <code>.venv\Scripts\python -m pip install -e ".[ui]"</code>.</li><li><strong>The Groove dropdown doesn't show my edited pattern's name</strong> — after editing, your working pattern is what plays even though the dropdown still names the last selected groove. Save it as a preset to give it a name in the list.</li></ul>
 <h2 id="getting-help-and-contributing">Getting help and contributing</h2>
-<p>FreedomHawk is free software: <a href="https://github.com/CoveCathedral/FreedomHawk">github.com/CoveCathedral/FreedomHawk</a>. Issues and pull requests are welcome — screen-reader testing feedback most of all.</p>
-<p><strong>Licensing.</strong> Copyright © 2026 Kaylea Fox, under the GNU Affero General Public License v3 or later. <strong>You may use FreedomHawk for anything, including paid work.</strong> If you distribute a modified version, you must share your source under the same license and keep the credit. For closed-source or commercial use, a separate commercial license can be arranged — get in touch. FreedomHawk ships none of Line 6's data; you generate that locally from an app copy you lawfully own.</p>
+<p>WaterHawk is free software: <a href="https://github.com/CoveCathedral/WaterHawk">github.com/CoveCathedral/WaterHawk</a>. Issues and pull requests are welcome — screen-reader testing feedback most of all.</p>
+<p><strong>Licensing.</strong> Copyright © 2026 Kaylea Fox, under the GNU Affero General Public License v3 or later. <strong>You may use WaterHawk for anything, including paid work.</strong> If you distribute a modified version, you must share your source under the same license and keep the credit. For closed-source or commercial use, a separate commercial license can be arranged — get in touch. WaterHawk ships none of Line 6's data; you generate that locally from an app copy you lawfully own.</p>
 </main>
 </div>
 </body>

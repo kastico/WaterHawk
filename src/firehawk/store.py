@@ -2,7 +2,7 @@
 
 Stored as JSON under the user's app-data directory so preferences survive restarts.  This
 is deliberately generic — a flat key/value store plus load/save — so it carries no
-knowledge of any particular app's views; FreedomHawk layers its own tab-order logic on top
+knowledge of any particular app's views; WaterHawk layers its own tab-order logic on top
 (see ``firehawk.config``).
 """
 
@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 
-def _config_dir(app_name: str = "FreedomHawk") -> Path:
+def _config_dir(app_name: str = "WaterHawk") -> Path:
     base = os.environ.get("APPDATA") or str(Path.home())
     return Path(base) / app_name
 
@@ -23,7 +23,7 @@ class AppSettings:
     (``%APPDATA%/<app_name>/settings.json``); pass ``path`` to override the file directly
     (used by tests and by hosts that keep their own settings file)."""
 
-    def __init__(self, app_name: str = "FreedomHawk", path=None) -> None:
+    def __init__(self, app_name: str = "WaterHawk", path=None) -> None:
         self._file = Path(path) if path is not None else _config_dir(app_name) / "settings.json"
         self.data: dict = {}
         self.load()

@@ -1,4 +1,4 @@
-# FreedomHawk — Decision Records
+# WaterHawk — Decision Records
 
 Numbered, append-only records: context, decision, consequences, and any standing
 obligations. A deviation from plan requires a new record. Newest at the bottom.
@@ -7,7 +7,7 @@ obligations. A deviation from plan requires a new record. Newest at the bottom.
 
 ## DR-001 — Adopt the agile + GitHub-tracker process (2026-07-20)
 
-**Context.** FreedomHawk reached real structure — a reverse-engineered wire protocol, an
+**Context.** WaterHawk reached real structure — a reverse-engineered wire protocol, an
 accessible wxPython editor, an offline transport, 116 passing tests — but its backlog lived
 in prose (`ROADMAP.md`, the working `THREADS.md`) and in memory. Kaylea runs an agile +
 GitHub-native tracking process (proven on Silk; see

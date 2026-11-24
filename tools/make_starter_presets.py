@@ -1,4 +1,4 @@
-"""Generate FreedomHawk starter presets into src/firehawk/presets/.
+"""Generate WaterHawk starter presets into src/firehawk/presets/.
 
 These are the project's own starting-point tones (not Line 6 factory presets, which
 live on the pedal). Each is built through the validated EditBuffer so every model and
@@ -62,7 +62,7 @@ STARTERS = [
 def build(cat: ModelCatalog, spec: dict) -> Preset:
     buf = EditBuffer(cat, Preset.load_default(cat.data_dir))
     buf.preset.meta = {
-        "name": spec["name"], "author": "FreedomHawk", "band": "",
+        "name": spec["name"], "author": "WaterHawk", "band": "",
         "style": spec["style"], "instrument": "Electric",
     }
     amp_model, amp_params = spec["amp"]

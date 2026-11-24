@@ -1,15 +1,15 @@
-# FreedomHawk — Status
+# WaterHawk — Status
 
 **Slim by design.** The tracker is the source of truth — this is a summary plus a pointer,
 refreshed at phase boundaries.
 
-- **Live queue:** https://github.com/CoveCathedral/FreedomHawk/issues
+- **Live queue:** https://github.com/CoveCathedral/WaterHawk/issues
 - **Fastest view:** `gh issue list` · **What waits on Kaylea:** `gh issue list --label needs-human-test`
 - **Decisions:** [DECISIONS.md](DECISIONS.md) · **Full phase history:** [../ROADMAP.md](../ROADMAP.md)
 
 ## Where things stand (2026-07-20)
 
-FreedomHawk is an accessible, screen-reader-first Windows controller for the Line 6 Firehawk
+WaterHawk is an accessible, screen-reader-first Windows controller for the Line 6 Firehawk
 FX pedal — the offline replacement for the discontinued Firehawk Remote app.
 
 **Working today (offline):** the full tone model (261 models, ranges, types), the accessible

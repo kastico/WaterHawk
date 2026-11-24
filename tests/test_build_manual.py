@@ -61,7 +61,7 @@ def test_wrapped_list_item_joins_continuation():
 def test_full_manual_builds():
     src = _ROOT / "docs" / "user-manual.md"
     title, toc, body = bm.convert(src.read_text(encoding="utf-8"))
-    assert title == "FreedomHawk User Manual"
+    assert title == "WaterHawk User Manual"
     assert len(toc) >= 15
     page = bm.render_page(title, toc, body)
     assert "\x00" not in page                       # no leftover placeholders

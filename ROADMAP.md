@@ -121,7 +121,7 @@ All screen-reader-first, native controls only.
   guitar, 4/5/6-string bass) + full tuning library. Far more useful to a blind player than
   the pedal's light-based tuner.
 - **Customizable tab order** — DONE. Settings → Arrange Tabs (Alt+Up/Down); persists to
-  `%APPDATA%/FreedomHawk/settings.json`. The Tuner defaults to the bottom.
+  `%APPDATA%/WaterHawk/settings.json`. The Tuner defaults to the bottom.
 - **Low-vision visual accessibility** — DONE (the primary user is low-vision, not fully
   blind; additive to the NVDA-first design). Enlarged + widened tab sidebar (15pt bold);
   navigable **HTML user manual** (`scripts/build_manual.py` → TOC + anchored headings,

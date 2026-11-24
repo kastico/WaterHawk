@@ -2,7 +2,7 @@
 
 This is the one step that needs a phone. Its whole purpose is to grab **one real message**
 that the old Firehawk Remote app sends to the pedal for a *known* action (say, nudging the
-Amp Drive knob), so we can compare it byte-for-byte against what FreedomHawk *would* send
+Amp Drive knob), so we can compare it byte-for-byte against what WaterHawk *would* send
 for the same action (Device → View Outgoing Messages). If they match, the reverse
 engineering is confirmed and the last two inferred constants (the float type tag and the
 transport port) are locked in.
@@ -66,7 +66,7 @@ reason to keep logging all your Bluetooth traffic.
 
 I open the log, filter to the RFCOMM data going to the pedal, and find the frame that
 starts with the sync bytes `55 55`. Because you told me exactly which knob you moved, I can
-line the captured bytes up against FreedomHawk's staged message for that same edit
+line the captured bytes up against WaterHawk's staged message for that same edit
 (`Device → View Outgoing Messages`) and against `tools/crc_hunt.py`. Three things fall out:
 
 - confirmation the frame + CRC are exactly right,

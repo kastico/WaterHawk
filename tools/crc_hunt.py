@@ -11,7 +11,7 @@ What Ghidra already established (see ../docs/protocol.md), for reference:
   * The serial frame is length-prefixed, NOT HDLC — sync 0x55 0x55, then a 12-byte
     header, then the payload. There is no 0x7E/0x7D byte-stuffing, so feed captured
     bytes to this tool RAW (no un-escaping needed).
-  * FreedomHawk wrinkle: the header CRC (frame bytes 10-11) is computed over the whole
+  * WaterHawk wrinkle: the header CRC (frame bytes 10-11) is computed over the whole
     12-byte header with those 2 CRC bytes treated as zero. So for a 12-byte control
     frame, the checksummed region is bytes[0:12] with bytes[10:12]=0 — slightly
     different from this tool's "everything before the trailing 2 bytes" assumption.

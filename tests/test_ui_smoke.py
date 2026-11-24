@@ -97,8 +97,8 @@ def test_editing_still_works_after_reorder(frame):
     assert frame.buffer.get_param("amp", "Bass") == pytest.approx(0.42)
 
 
-def test_app_window_title_is_freedomhawk(frame):
-    assert frame.GetTitle() == "FreedomHawk"
+def test_app_window_title_is_waterhawk(frame):
+    assert frame.GetTitle() == "WaterHawk"
 
 
 def test_every_control_has_accessible_name(frame):

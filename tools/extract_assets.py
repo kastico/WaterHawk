@@ -1,6 +1,6 @@
 """Extract the Firehawk tone-model data from your own copy of the Line 6 app.
 
-FreedomHawk ships no Line 6 data.  To keep the project a clean, non-redistributing
+WaterHawk ships no Line 6 data.  To keep the project a clean, non-redistributing
 interoperability tool, the pedal's model/parameter/catalog data is NOT stored in this
 repository — you generate it locally from an APK of the (discontinued) Firehawk Remote
 app that you lawfully have.

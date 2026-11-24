@@ -1,6 +1,6 @@
 # Issue tracker: GitHub
 
-Work items for this repo live as GitHub Issues in `kastico/FreedomHawk` (private). Use the `gh` CLI.
+Work items for this repo live as GitHub Issues in `kastico/WaterHawk` (private). Use the `gh` CLI.
 
 - **Create**: `gh issue create --title "..." --body "..."` (heredoc for multi-line bodies)
 - **Read**: `gh issue view <number> --comments`

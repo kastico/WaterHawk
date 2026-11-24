@@ -1,4 +1,4 @@
-"""FreedomHawk's persistent settings: the generic store plus this app's tab order.
+"""WaterHawk's persistent settings: the generic store plus this app's tab order.
 
 The generic store lives in ``firehawk.store``; here we add the view list (pedal blocks +
 Tuner) and the saved page order on top of it.
@@ -11,9 +11,9 @@ from .store import _config_dir
 
 from .model import SLOT_LAYOUT
 
-#: The settings file FreedomHawk uses (its own app-data folder).  Kept as a module global
+#: The settings file WaterHawk uses (its own app-data folder).  Kept as a module global
 #: so tests can point it at a temp file before constructing the app.
-CONFIG_FILE = _config_dir("FreedomHawk") / "settings.json"
+CONFIG_FILE = _config_dir("WaterHawk") / "settings.json"
 
 
 def all_views() -> list[tuple[str, str]]:
@@ -28,7 +28,7 @@ DEFAULT_PAGE_ORDER = ["presets"] + [s.id for s in SLOT_LAYOUT] + ["tuner"]
 
 
 class AppSettings(_BaseSettings):
-    """The settings store plus FreedomHawk's tab-order logic."""
+    """The settings store plus WaterHawk's tab-order logic."""
 
     def __init__(self) -> None:
         super().__init__(path=CONFIG_FILE)

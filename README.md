@@ -1,4 +1,4 @@
-# FreedomHawk
+# WaterHawk
 
 **An open-source, accessible, screen-reader-first Windows controller for the Line 6 Firehawk FX.**
 
@@ -11,7 +11,7 @@ low-vision owner cannot reach hundreds of parameters (amps, cabs, effects, rever
 
 To keep using my pedal, I was obligated to rework it, using a form that suits my needs.
 That is the same path every Firehawk owner who needs an accessible editor is forced to take.
-FreedomHawk gives that option to more users: a free, open editor for the hardware you already own.
+WaterHawk gives that option to more users: a free, open editor for the hardware you already own.
 
 ## Status
 
@@ -33,7 +33,7 @@ This is early, working software. It is not affiliated with or endorsed by Line 6
 
 ## Your tone data is not included
 
-FreedomHawk ships **no** Line 6 data. You generate it once from an APK of the (discontinued)
+WaterHawk ships **no** Line 6 data. You generate it once from an APK of the (discontinued)
 Firehawk Remote app that you lawfully have. This keeps the project a clean interoperability
 tool that redistributes nothing proprietary. See `src/firehawk/data/README.md`.
 

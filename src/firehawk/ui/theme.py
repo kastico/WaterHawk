@@ -42,7 +42,7 @@ def enlarge_listbook_sidebar(listbook) -> None:
 
     A Listbook sizes its list to the (small) default font at creation and won't re-widen on
     its own, so measure the widest tab label at the larger font and force the width.  Shared
-    by the FreedomHawk window.
+    by the WaterHawk window.
     """
     getter = getattr(listbook, "GetListView", None)
     lv = getter() if callable(getter) else None

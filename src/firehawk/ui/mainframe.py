@@ -24,7 +24,7 @@ from .blockpanel import BlockPanel
 from .presetspanel import PresetsPanel
 from .tunerpanel import TunerPanel
 
-APP_TITLE = "FreedomHawk"
+APP_TITLE = "WaterHawk"
 
 
 def _is_within(window: wx.Window | None, ancestor: wx.Window) -> bool:
@@ -626,8 +626,8 @@ class MainFrame(wx.Frame):
                 except OSError:
                     continue
         wx.MessageBox(
-            "The manual lives at docs\\user-manual.html in the FreedomHawk folder, and "
-            "online at github.com/CoveCathedral/FreedomHawk.",
+            "The manual lives at docs\\user-manual.html in the WaterHawk folder, and "
+            "online at github.com/CoveCathedral/WaterHawk.",
             "User manual", wx.ICON_INFORMATION)
 
     def _on_keys(self, event) -> None:
@@ -689,6 +689,6 @@ class MainFrame(wx.Frame):
             "later. It comes with ABSOLUTELY NO WARRANTY. You may use it for anything,\n"
             "including paid work; if you distribute a modified version you must share\n"
             "your source under the same license.\n\n"
-            "Source code: github.com/CoveCathedral/FreedomHawk",
-            "About FreedomHawk", wx.ICON_INFORMATION,
+            "Source code: github.com/CoveCathedral/WaterHawk",
+            "About WaterHawk", wx.ICON_INFORMATION,
         )

@@ -3,7 +3,7 @@
 This folder holds the Firehawk tone model — the amp/cab/effect/reverb models, their
 parameters and ranges, the catalogs, the default preset, and the symbol table.
 
-Those files are **Line 6's data**, so FreedomHawk does not redistribute them. Instead you
+Those files are **Line 6's data**, so WaterHawk does not redistribute them. Instead you
 generate this folder from an APK of the (discontinued) Firehawk Remote app that you
 lawfully have, with:
 

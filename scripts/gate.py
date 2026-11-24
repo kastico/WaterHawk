@@ -1,4 +1,4 @@
-"""FreedomHawk local gate — must pass before any PR opens.
+"""WaterHawk local gate — must pass before any PR opens.
 
 Run with the project venv's Python:  .venv\\Scripts\\python scripts\\gate.py
 
